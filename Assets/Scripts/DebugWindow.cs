@@ -23,7 +23,6 @@ public class DebugWindow : MonoBehaviour {
         }
     }
 
-    private Vector2 originSize;
     private bool display;
 
     void Start(){
@@ -31,7 +30,6 @@ public class DebugWindow : MonoBehaviour {
             Destroy(gameObject);
         DontDestroyOnLoad(this);
 
-        originSize = instance.debugText.rectTransform.sizeDelta;
         display = image.enabled;
     }
 
@@ -52,10 +50,9 @@ public class DebugWindow : MonoBehaviour {
             if ( instance.persistent ) instance.debugText.text += "\n" + s;
             else instance.debugText.text = s;
 
-            float size = Screen.height*0.05f*instance.debugText.text.Split('\n').Length;
-            if ( size < instance.originSize.y ) size = instance.originSize.y;
+            float size = Screen.height*0.03f*instance.debugText.text.Split('\n').Length;
 
-            instance.debugText.rectTransform.sizeDelta = new Vector2(instance.originSize.x,size);
+            instance.debugText.rectTransform.sizeDelta = new Vector2(Screen.width*0.95f,size);
             instance.scrollBar.value = 0f;
         }
         Debug.Log(s);

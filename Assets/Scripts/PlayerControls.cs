@@ -19,6 +19,9 @@ public class PlayerControls : MonoBehaviour {
     public bool freeFalling = false;
     private float freeFallTime;
     private bool attacking = false;
+    public bool knockBack = false;
+    private Vector3 impact = Vector3.zero;
+    private float knockBackTime;
 
     private static Object lockObject = new Object();
     private static PlayerControls _instance;
@@ -74,9 +77,16 @@ public class PlayerControls : MonoBehaviour {
         }
     }
     void LateUpdate(){
-        velocity.y += Physics.gravity.y * Time.deltaTime;
-        characterController.Move(velocity * Time.deltaTime);
-        anim.SetFloat("Speed",Mathf.Abs(characterController.velocity.x));
+        if ( !knockBack ){
+            velocity.y += Physics.gravity.y * Time.deltaTime;
+            characterController.Move(velocity * Time.deltaTime);
+            anim.SetFloat("Speed",Mathf.Abs(characterController.velocity.x));
+        } else {
+            impact.y += Physics.gravity.y * Time.deltaTime;
+            characterController.Move(impact * Time.deltaTime);
+            if ( Time.time - knockBackTime >= 0.5f )
+                knockBack = false;
+        }
         CheckIfOnGround();
     }
 
@@ -120,6 +130,14 @@ public class PlayerControls : MonoBehaviour {
 
         attacking = false;
         anim.SetBool("Attack",false);
+    }
+    public void KnockBack(Vector3 direction){
+        DebugWindow.LogSystem(GetType().Name,System.Reflection.MethodBase.GetCurrentMethod().Name);
+        knockBack = true;
+        var dir = -direction;
+        dir.y = 1f;
+        impact = dir*2.5f;
+        knockBackTime = Time.time;
     }
 
     private void CheckIfOnGround(){

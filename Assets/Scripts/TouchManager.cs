@@ -37,7 +37,6 @@ public class TouchManager : MonoBehaviour {
 
         startTime = Time.time;
     }
-
     void Update(){
         if ( Application.isMobilePlatform ){
             if ( Input.touchCount > 0 ){
@@ -55,7 +54,7 @@ public class TouchManager : MonoBehaviour {
                             if ( si != null ) si.OnEnter();
                         #endregion
                         #region Move Camera
-                        } else {
+                        } else if ( !PlayerControls.instance.gameObject.activeSelf ){
                             if ( camera_onClickMove ){
                                 CameraControls.instance.Move(Camera.main.ScreenToWorldPoint(Input.mousePosition));
                             } else {
@@ -93,7 +92,7 @@ public class TouchManager : MonoBehaviour {
                                 si.OnDrag();
                             }
                         }
-                    } else {
+                    } else if ( !PlayerControls.instance.gameObject.activeSelf ){
                     #endregion
                     #region Move Camera
                         if ( !camera_onClickMove && !InDeadZone() ){
@@ -143,7 +142,7 @@ public class TouchManager : MonoBehaviour {
                         if ( si != null ) si.OnEnter();
                     #endregion
                     #region Move Camera
-                    } else {
+                    } else if ( !PlayerControls.instance.gameObject.activeSelf ){
                         if ( camera_onClickMove ){
                             CameraControls.instance.Move(Camera.main.ScreenToWorldPoint(Input.mousePosition));
                         } else {
@@ -181,7 +180,7 @@ public class TouchManager : MonoBehaviour {
                             si.OnDrag();
                         }
                     }
-                } else {
+                } else if ( !PlayerControls.instance.gameObject.activeSelf ){
                 #endregion
                 #region Move Camera
                     if ( !camera_onClickMove && !InDeadZone() ){

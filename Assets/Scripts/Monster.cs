@@ -39,6 +39,11 @@ public class Monster : MonoBehaviour, Character {
             return currentStats.baseDmg;
         }
     }
+    public GameObject obj {
+        get {
+            return gameObject;
+        }
+    }
 
     public Pet GetTarget(){
         return target;
@@ -75,6 +80,7 @@ public class Monster : MonoBehaviour, Character {
     private void StateMachine(){
         switch (state){
         case State.idle:
+            Wander();
             FindTarget();
         break;
         case State.chase:
@@ -84,6 +90,7 @@ public class Monster : MonoBehaviour, Character {
                 SetState(State.idle);
         break;
         case State.attack:
+            velocity = Vector3.zero;
             // Double check target is within attack range, in case player has avoided attack
             if ( Vector3.Distance(transform.position,target.transform.position) < attackRange ){
                 attacking = true;
@@ -124,15 +131,20 @@ public class Monster : MonoBehaviour, Character {
     }
     private void FindTarget(){
         RaycastHit hit;
-        if ( Physics.Raycast(transform.position,transform.forward,out hit,viewDistance, 1 << LayerMask.NameToLayer("Character")) ){
+        Vector3 pos = transform.position;
+        pos.y += characterController.height/2.0f;
+        if ( Physics.Raycast(pos,transform.forward,out hit,viewDistance, 1 << LayerMask.NameToLayer("Character")) ){
+            DebugWindow.Log(name + " found a target, " + hit.collider.name + ".");
             if ( hit.collider.GetComponent<Pet>() != null ){
                 Pet p = hit.collider.GetComponent<Pet>();
                 target = p;
+                SetState(State.chase);
             } else {
                 Monster m = hit.collider.GetComponent<Monster>();
                 Pet p = m.GetTarget();
                 if ( p != null ){
                     SetTarget(p);
+                    SetState(State.chase);
                 }
             }
         }
@@ -141,7 +153,8 @@ public class Monster : MonoBehaviour, Character {
         if ( Vector3.Distance(transform.position,target.transform.position) < attackRange ){
             SetState(State.attack);
         } else {
-            if ( transform.position.x - target.transform.position.x < 0 ){
+            velocity = Vector3.zero;
+            if ( transform.position.x - target.transform.position.x > 0 ){
                 // Left 
                 transform.LookAt(Vector3.left+transform.position);
             } else {
@@ -162,7 +175,7 @@ public class Monster : MonoBehaviour, Character {
         }
     }
     
-    public void Hit(float dmg){
+    public void Hit(float dmg, Character c){
         DebugWindow.LogSystem(GetType().Name,System.Reflection.MethodBase.GetCurrentMethod().Name);
         currentStats.health -= dmg - currentStats.baseDef;
         if ( currentStats.health < 1 ){
@@ -178,7 +191,7 @@ public class Monster : MonoBehaviour, Character {
         if ( Physics.Raycast(pos,transform.forward,out hit,attackRange,1 << LayerMask.NameToLayer("Character")) ){
             Character target = hit.collider.GetComponent<Character>();
             if ( target != null ){
-                target.Hit(damage);
+                target.Hit(damage,this);
             }
         }
     }

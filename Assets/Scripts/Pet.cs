@@ -54,9 +54,14 @@ public class Pet : MonoBehaviour, Character {
             return currentStats.baseDmg;
         }
     }
+    public GameObject obj {
+        get {
+            return gameObject;
+        }
+    }
 
     private float invincibilityStartTime = 0f;
-    private float invincibilityFrequency = 5f;
+    private float invincibilityFrequency = 3f;
 
     void Start(){
         DebugWindow.LogSystem(GetType().Name,System.Reflection.MethodBase.GetCurrentMethod().Name);
@@ -228,12 +233,13 @@ public class Pet : MonoBehaviour, Character {
         }
     }
 
-    public void Hit(float dmg){
-        DebugWindow.LogSystem(GetType().Name,System.Reflection.MethodBase.GetCurrentMethod().Name);
+    public void Hit(float dmg, Character c){
         if ( !isAlive ) return;
         if ( Time.time - invincibilityStartTime >= invincibilityFrequency ){
+            DebugWindow.LogSystem(GetType().Name,System.Reflection.MethodBase.GetCurrentMethod().Name);
             currentStats.health -= dmg - currentStats.baseDef;
             invincibilityStartTime = Time.time;
+            playerControls.KnockBack(c.obj.transform.position-transform.position);
             if ( currentStats.health < 1 ){
                 currentStats.health = 0f;
                 Death();
@@ -248,7 +254,7 @@ public class Pet : MonoBehaviour, Character {
         if ( Physics.Raycast(pos,transform.forward,out hit,attackRange,1 << LayerMask.NameToLayer("Character")) ){
             Character target = hit.collider.GetComponent<Character>();
             if ( target != null ){
-                target.Hit(damage);
+                target.Hit(damage,this);
             }
         }
     }

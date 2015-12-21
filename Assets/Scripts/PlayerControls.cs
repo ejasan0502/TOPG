@@ -151,6 +151,7 @@ public class PlayerControls : MonoBehaviour {
             if ( !freeFalling ){
                 freeFalling = true;
                 freeFallTime = Time.time;
+                velocity.y = characterController.velocity.y;
             } else if ( Time.time - freeFallTime >= freeFallDuration ){
                 anim.SetBool("Jump",true);
             }

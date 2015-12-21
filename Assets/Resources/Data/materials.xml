@@ -1,0 +1,14 @@
+<Materials xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<Material>
+		<Name>Wood</Name>
+		<Id>m-0</Id>
+		<Description>A sturdy material used for making houses or furniture. Also flammable.</Description>
+		<Icon>Content/Icons/Materials/Wood</Icon>
+	</Material>
+	<Material>
+		<Name>Stone</Name>
+		<Id>m-1</Id>
+		<Description>A hard material used for making houses and other appliances.</Description>
+		<Icon>Content/Icons/Materials/Stone</Icon>
+	</Material>
+</Materials>

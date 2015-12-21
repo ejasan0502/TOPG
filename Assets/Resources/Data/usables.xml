@@ -1,0 +1,18 @@
+<Usables xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<Usable>
+		<Name>Salmon</Name>
+		<Id>uadd-0</Id>
+		<Description>A large fish with pinkish meat that bears love to eat.</Description>
+		<Icon>Content/Icons/Usables/Salmon</Icon>
+		<Stats>hungry-50</Stats>
+		<UsableType>add</UsableType>
+	</Usable>
+	<Usable>
+		<Name>Water Jar</Name>
+		<Id>uadd-1</Id>
+		<Description>A small jar filled with clean water.</Description>
+		<Icon>Content/Icons/Usables/WaterJar</Icon>
+		<Stats>thirsty-30</Stats>
+		<UsableType>add</UsableType>
+	</Usable>
+</Usables>

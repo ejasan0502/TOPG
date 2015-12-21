@@ -1,0 +1,24 @@
+<Equips xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<Equip>
+		<Name>Sword</Name>
+		<Id>ewen-0</Id>
+		<Description>A simple sword to help fight off monsters.</Description>
+		<Icon>Content/Icons/Weapons/Sword</Icon>
+		<EquipType>weapon</EquipType>
+		<baseDmg>5</baseDmg>
+		<baseDef>0</baseDef>
+		<assetPath>Content/Models/Weapons/Sword</assetPath>
+		<insulation>0</insulation>
+	</Equip>
+	<Equip>
+		<Name>Suit</Name>
+		<Id>ecoe-0</Id>
+		<Description>A fancy looking suit.</Description>
+		<Icon>Content/Icons/Costumes/Suit</Icon>
+		<EquipType>costume</EquipType>
+		<baseDmg>0</baseDmg>
+		<baseDef>10</baseDef>
+		<assetPath>Content/Models/Costumes/Suit</assetPath>
+		<insulation>5</insulation>
+	</Equip>
+</Equips>

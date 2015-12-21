@@ -78,7 +78,7 @@ public class PlayerControls : MonoBehaviour {
     }
     void LateUpdate(){
         if ( !knockBack ){
-            velocity.y += Physics.gravity.y * Time.deltaTime;
+            if ( freeFalling ) velocity.y += Physics.gravity.y * Time.deltaTime;
             characterController.Move(velocity * Time.deltaTime);
             anim.SetFloat("Speed",Mathf.Abs(characterController.velocity.x));
         } else {
@@ -97,14 +97,14 @@ public class PlayerControls : MonoBehaviour {
         anim = pet.GetComponent<Animator>();
     }
     public void MoveLeft(){
-        if ( pet != null && isGrounded && !attacking ){
+        if ( pet != null && !attacking ){
             velocity.x = 0f;
             pet.transform.LookAt(Vector3.left+pet.transform.position);
             velocity.x = pet.transform.forward.x*speed;
         }
     }
     public void MoveRight(){
-        if ( pet != null && isGrounded && !attacking ){
+        if ( pet != null && !attacking ){
             velocity.x = 0f;
             pet.transform.LookAt(Vector3.right+pet.transform.position);
             velocity.x = pet.transform.forward.x*speed;

@@ -248,6 +248,8 @@ public class Pet : MonoBehaviour, Character {
     }
     public void OnAttackEnd(){
         DebugWindow.LogSystem(GetType().Name,System.Reflection.MethodBase.GetCurrentMethod().Name);
+        if ( !isAlive ) return;
+
         RaycastHit hit;
         Vector3 pos = transform.position;
         pos.y += characterController.height/2.0f;

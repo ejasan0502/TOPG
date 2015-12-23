@@ -3,13 +3,9 @@ using System.Collections;
 
 public class Interactable : MonoBehaviour {
 
-    public InteractType interactType;
+    public bool isUI;
 
-    public bool isUI {
-        get {
-            return isDraggable;
-        }
-    }
+    public InteractType interactType;
     public bool isDraggable {
         get {
             return interactType == InteractType.draggable;
@@ -24,5 +20,6 @@ public class Interactable : MonoBehaviour {
 
 public enum InteractType {
     draggable,
-    pet
+    pet,
+    petSelect
 }

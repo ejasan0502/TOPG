@@ -28,6 +28,7 @@ public class TouchManager : MonoBehaviour {
     private int siblingIndex = 0;
 
     private bool petting = false;
+
     void Start(){
         DebugWindow.LogSystem(GetType().Name,System.Reflection.MethodBase.GetCurrentMethod().Name);
         if ( GameObject.FindObjectsOfType<TouchManager>().Length > 1 ){
@@ -43,186 +44,123 @@ public class TouchManager : MonoBehaviour {
             if ( Input.touchCount > 0 ){
                 Touch touch = Input.touches[0];
                 if ( touch.phase == TouchPhase.Began ){
-                    if ( !InDeadZone() ){
-                        #region Selecting an object
-                        if ( selectedObj != null ){
-                            if ( selectedObj.isDraggable ){
-                                siblingIndex = selectedObj.transform.GetSiblingIndex();
-                                selectedObj.transform.SetAsLastSibling();
-                            }
-
-                            SpecialInteraction si = selectedObj.GetComponent<SpecialInteraction>();
-                            if ( si != null ) si.OnEnter();
-                        #endregion
-                        #region Move Camera
-                        } else if ( PlayerControls.instance.pet == null ){
-                            if ( camera_onClickMove ){
-                                CameraControls.instance.Move(Camera.main.ScreenToWorldPoint(Input.mousePosition));
-                            } else {
-                                selectedObj = GetInteractable();
-                            }
-                        }
-                        #endregion
-                    }
-                    prevMousePos = Input.mousePosition;
+                    OnEnter();
                 }
                 if ( touch.phase == TouchPhase.Stationary || touch.phase == TouchPhase.Moved ){
-                    #region An object was selected
-                    if ( selectedObj != null ){
-                        if ( selectedObj.isDraggable ){
-                            Vector3 desiredPos = Vector3.zero;
-                            desiredPos = Input.mousePosition;
-                            desiredPos.z = selectedObj.transform.position.z;
-                            selectedObj.transform.position = desiredPos;
-                        } else if ( selectedObj.isPet ){
-                            if ( Time.time - startTime >= 1f && Vector3.Distance(prevMousePos,Input.mousePosition) > 1f ){
-                                Pet p = selectedObj.GetComponent<Pet>();
-                                p.BePetted();
-
-                                startTime = Time.time;
-                                prevMousePos = Input.mousePosition;
-                                petting = true;
-                            }
-                        }
-
-                        SpecialInteraction si = selectedObj.GetComponent<SpecialInteraction>();
-                        if ( si != null ) {
-                            if ( Vector3.Distance(prevMousePos,Input.mousePosition) < 1f ){
-                                si.OnHold();
-                            } else {
-                                si.OnDrag();
-                            }
-                        }
-                    } else if ( PlayerControls.instance.pet == null ){
-                    #endregion
-                    #region Move Camera
-                        if ( !camera_onClickMove && !InDeadZone() ){
-                            Vector3 desiredPos = Camera.main.ScreenToWorldPoint(prevMousePos) - Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                            CameraControls.instance.Move(desiredPos);
-                        }
-                    }
-                    #endregion
+                    OnHold();
                 }
                 if ( touch.phase == TouchPhase.Ended ){
-                    if ( selectedObj != null ){
-                        if ( selectedObj.isDraggable ){
-                            selectedObj.transform.SetSiblingIndex(siblingIndex);
-                        } else if ( selectedObj.isPet  && !petting ){
-                            petInfo.transform.GetChild(0).GetComponent<PetStatsHud>().pet = selectedObj.GetComponent<Pet>();
-                            petInfo.SetActive(!petInfo.activeSelf);
-                            if ( petInfo.activeSelf ){
-                                Pet p = selectedObj.GetComponent<Pet>();
-                                p.selected = true;
-                                CameraControls.instance.Follow(selectedObj.transform);
-                            } else {
-                                Pet p = selectedObj.GetComponent<Pet>();
-                                p.selected = false;
-                                CameraControls.instance.ClearFollowing();
-                            }
-                        }
-
-                        SpecialInteraction si = selectedObj.GetComponent<SpecialInteraction>();
-                        if ( si != null ) si.OnExit();
-
-                        selectedObj = null;
-                        petting = false;
-                    }
+                    OnExit();
                 }
             }
         } else {
         #endregion
         #region Editor/PC
             if ( Input.GetMouseButtonDown(0) ){
-                if ( !InDeadZone() ){
-                    #region Selecting an object
-                    if ( selectedObj != null ){
-                        if ( selectedObj.isDraggable ){
-                            siblingIndex = selectedObj.transform.GetSiblingIndex();
-                            selectedObj.transform.SetAsLastSibling();
-                        }
-
-                        SpecialInteraction si = selectedObj.GetComponent<SpecialInteraction>();
-                        if ( si != null ) si.OnEnter();
-                    #endregion
-                    #region Move Camera
-                    } else if ( PlayerControls.instance.pet == null ){
-                        if ( camera_onClickMove ){
-                            CameraControls.instance.Move(Camera.main.ScreenToWorldPoint(Input.mousePosition));
-                        } else {
-                            selectedObj = GetInteractable();
-                        }
-                    }
-                    #endregion
-                }
-                prevMousePos = Input.mousePosition;
+                OnEnter();
             }
             if ( Input.GetMouseButton(0) ){
-                #region An object was selected
-                if ( selectedObj != null ){
-                    if ( selectedObj.isDraggable ){
-                        Vector3 desiredPos = Vector3.zero;
-                        desiredPos = Input.mousePosition;
-                        desiredPos.z = selectedObj.transform.position.z;
-                        selectedObj.transform.position = desiredPos;
-                    } else if ( selectedObj.isPet ){
-                        if ( Time.time - startTime >= 1f && Vector3.Distance(prevMousePos,Input.mousePosition) > 1f ){
-                            Pet p = selectedObj.GetComponent<Pet>();
-                            p.BePetted();
-
-                            startTime = Time.time;
-                            prevMousePos = Input.mousePosition;
-                            petting = true;
-                        }
-                    }
-
-                    SpecialInteraction si = selectedObj.GetComponent<SpecialInteraction>();
-                    if ( si != null ) {
-                        if ( Vector3.Distance(prevMousePos,Input.mousePosition) < 1f ){
-                            si.OnHold();
-                        } else {
-                            si.OnDrag();
-                        }
-                    }
-                } else if ( PlayerControls.instance.pet == null ){
-                #endregion
-                #region Move Camera
-                    if ( !camera_onClickMove && !InDeadZone() ){
-                        Vector3 desiredPos = Camera.main.ScreenToWorldPoint(prevMousePos) - Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                        CameraControls.instance.Move(desiredPos);
-                    }
-                }
-                #endregion
+                OnHold();
             }
             if ( Input.GetMouseButtonUp(0) ){
-                if ( selectedObj != null ){
-                    if ( selectedObj.isDraggable ){
-                        selectedObj.transform.SetSiblingIndex(siblingIndex);
-                    } else if ( selectedObj.isPet  && !petting ){
-                        petInfo.transform.GetChild(0).GetComponent<PetStatsHud>().pet = selectedObj.GetComponent<Pet>();
-                        petInfo.SetActive(!petInfo.activeSelf);
-                        if ( petInfo.activeSelf ){
-                            Pet p = selectedObj.GetComponent<Pet>();
-                            p.selected = true;
-                            CameraControls.instance.Follow(selectedObj.transform);
-                        } else {
-                            Pet p = selectedObj.GetComponent<Pet>();
-                            p.selected = false;
-                            CameraControls.instance.ClearFollowing();
-                        }
-                    }
-
-                    SpecialInteraction si = selectedObj.GetComponent<SpecialInteraction>();
-                    if ( si != null ) si.OnExit();
-
-                    selectedObj = null;
-                    petting = false;
-                }
+                OnExit();
             }
         }
         #endregion
     }
 
+    private void OnEnter(){
+        DebugWindow.LogSystem(GetType().Name,System.Reflection.MethodBase.GetCurrentMethod().Name);
+        if ( !InDeadZone() ){
+            #region Selecting an object
+            if ( selectedObj != null ){
+                if ( selectedObj.isDraggable ){
+                    siblingIndex = selectedObj.transform.GetSiblingIndex();
+                    selectedObj.transform.SetAsLastSibling();
+                }
+
+                SpecialInteraction si = selectedObj.GetComponent<SpecialInteraction>();
+                if ( si != null ) si.OnEnter();
+            #endregion
+            #region Move Camera
+            } else if ( PlayerControls.instance.pet == null ){
+                if ( camera_onClickMove ){
+                    CameraControls.instance.Move(Camera.main.ScreenToWorldPoint(Input.mousePosition));
+                } else {
+                    selectedObj = GetInteractable();
+                }
+            }
+            #endregion
+        }
+        prevMousePos = Input.mousePosition;
+    }
+    private void OnHold(){
+        DebugWindow.LogSystem(GetType().Name,System.Reflection.MethodBase.GetCurrentMethod().Name);
+        #region An object was selected
+        if ( selectedObj != null ){
+            if ( selectedObj.isDraggable ){
+                Vector3 desiredPos = Vector3.zero;
+                desiredPos = Input.mousePosition;
+                desiredPos.z = selectedObj.transform.position.z;
+                selectedObj.transform.position = desiredPos;
+            } else if ( selectedObj.isPet ){
+                if ( Time.time - startTime >= 1f && Vector3.Distance(prevMousePos,Input.mousePosition) > 1f ){
+                    Pet p = selectedObj.GetComponent<Pet>();
+                    p.BePetted();
+
+                    startTime = Time.time;
+                    prevMousePos = Input.mousePosition;
+                    petting = true;
+                }
+            }
+
+            SpecialInteraction si = selectedObj.GetComponent<SpecialInteraction>();
+            if ( si != null ) {
+                if ( Vector3.Distance(prevMousePos,Input.mousePosition) < 1f ){
+                    si.OnHold();
+                } else {
+                    si.OnDrag();
+                }
+            }
+        } else if ( PlayerControls.instance.pet == null ){
+        #endregion
+        #region Move Camera
+            if ( !camera_onClickMove && !InDeadZone() ){
+                Vector3 desiredPos = Camera.main.ScreenToWorldPoint(prevMousePos) - Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                CameraControls.instance.Move(desiredPos);
+            }
+        }
+        #endregion
+    }
+    private void OnExit(){
+        DebugWindow.LogSystem(GetType().Name,System.Reflection.MethodBase.GetCurrentMethod().Name);
+        if ( selectedObj != null ){
+            if ( selectedObj.isDraggable ){
+                selectedObj.transform.SetSiblingIndex(siblingIndex);
+            } else if ( selectedObj.isPet  && !petting ){
+                petInfo.transform.GetChild(0).GetComponent<PetStatsHud>().pet = selectedObj.GetComponent<Pet>();
+                petInfo.SetActive(!petInfo.activeSelf);
+                if ( petInfo.activeSelf ){
+                    Pet p = selectedObj.GetComponent<Pet>();
+                    p.selected = true;
+                    CameraControls.instance.Follow(selectedObj.transform);
+                } else {
+                    Pet p = selectedObj.GetComponent<Pet>();
+                    p.selected = false;
+                    CameraControls.instance.ClearFollowing();
+                }
+            }
+
+            SpecialInteraction si = selectedObj.GetComponent<SpecialInteraction>();
+            if ( si != null ) si.OnExit();
+
+            selectedObj = null;
+            petting = false;
+        }
+    }
+
     private Interactable GetInteractable(){
+        DebugWindow.LogSystem(GetType().Name,System.Reflection.MethodBase.GetCurrentMethod().Name);
         foreach (Interactable o in GameObject.FindObjectsOfType<Interactable>()){
             if ( o.isUI ){
                 RectTransform rt = o.transform as RectTransform;

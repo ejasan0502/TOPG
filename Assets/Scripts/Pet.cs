@@ -75,6 +75,7 @@ public class Pet : MonoBehaviour, Character {
     public Vector3 wanderPos;
     private Vector3 velocity = Vector3.zero;
     [HideInInspector] public bool selected = false;
+    public bool isGrounded = false;
     
     public bool isAlive {
         get {
@@ -123,12 +124,10 @@ public class Pet : MonoBehaviour, Character {
         }
     }
     void Update(){
-        if ( !selected && !playerControls.enabled ){
+        if ( !selected && playerControls.pet == null ){
             switch(state){
             case State.idle:
-            if ( !playerControls.enabled ){
-                Wander();
-            }
+            Wander();
             break;
             }
         } else if ( selected ){
@@ -169,27 +168,39 @@ public class Pet : MonoBehaviour, Character {
     }
     private void Wander(){
         if ( ground != null ){
-            velocity = Vector3.zero;
-            if ( Time.time - wanderTime >= wanderFrequency ){
-                int count = 0;
-                wanderPos.x = Random.Range(ground.bounds.min.x,ground.bounds.max.x);
-                while ( Vector3.Distance(transform.position,wanderPos) < 3f || count > 3 ){
+            velocity.x = 0f;
+            if ( isGrounded ){
+                if ( Time.time - wanderTime >= wanderFrequency ){
+                    int count = 0;
                     wanderPos.x = Random.Range(ground.bounds.min.x,ground.bounds.max.x);
-                    count++;
+                    while ( Vector3.Distance(transform.position,wanderPos) < 3f || count > 3 ){
+                        wanderPos.x = Random.Range(ground.bounds.min.x,ground.bounds.max.x);
+                        count++;
+                    }
+
+                    if ( transform.position.x - wanderPos.x > 0 ){
+                        transform.LookAt(Vector3.left+transform.position);
+                    } else {
+                        transform.LookAt(Vector3.right+transform.position);
+                    }
+
+                    wanderFrequency = Random.Range(3f,7f);
+                    wanderTime = Time.time;
                 }
 
-                wanderFrequency = Random.Range(3f,7f);
-                wanderTime = Time.time;
+                if ( Vector3.Distance(transform.position,wanderPos) > 0.5f ) {
+                    velocity = transform.forward * movtSpd;
+                }
             }
 
-            if ( Vector3.Distance(transform.position,wanderPos) > 0.1f ) {
-                if ( transform.position.x - wanderPos.x > 0 ){
-                    transform.LookAt(Vector3.left+transform.position);
-                } else {
-                    transform.LookAt(Vector3.right+transform.position);
-                }
-                velocity = transform.forward * 5f;
+            if ( Physics.Raycast(transform.position,transform.TransformDirection(Vector3.down),0.1f, 1 << LayerMask.NameToLayer("Ground"))){
+                isGrounded = true;
+            } else {
+                isGrounded = false;
+                wanderPos = transform.position;
             }
+            if ( !isGrounded ) 
+                velocity.y += Physics.gravity.y * Time.deltaTime;
             characterController.Move(velocity * Time.deltaTime);
             anim.SetFloat("Speed",Mathf.Abs(velocity.x));
         }

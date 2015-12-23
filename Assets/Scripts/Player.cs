@@ -16,8 +16,7 @@ public class Player {
     public void AddPet(Pet p){
         if ( !pets.Contains(p) ){
             pets.Add(p);
-            Pet o = GameObject.Instantiate(p);
-            o.gameObject.AddComponent<TempGravity>();
+            GameObject.Instantiate(p);
             Camera.main.orthographicSize = 5;
         }
     }

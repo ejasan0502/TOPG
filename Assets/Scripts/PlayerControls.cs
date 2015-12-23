@@ -9,6 +9,7 @@ public class PlayerControls : MonoBehaviour {
     public float jumpForce = 10f;
     public float freeFallDuration = 3f;
     public GameObject petInfo;
+    public GameObject petHud;
 
     private CharacterController characterController;
     private Animator anim;
@@ -77,22 +78,25 @@ public class PlayerControls : MonoBehaviour {
         }
     }
     void LateUpdate(){
-        if ( !knockBack ){
-            if ( freeFalling ) velocity.y += Physics.gravity.y * Time.deltaTime;
-            characterController.Move(velocity * Time.deltaTime);
-            anim.SetFloat("Speed",Mathf.Abs(characterController.velocity.x));
-        } else {
-            impact.y += Physics.gravity.y * Time.deltaTime;
-            characterController.Move(impact * Time.deltaTime);
-            if ( Time.time - knockBackTime >= 0.5f )
-                knockBack = false;
+        if ( pet != null ){
+            if ( !knockBack ){
+                if ( freeFalling ) velocity.y += Physics.gravity.y * Time.deltaTime;
+                characterController.Move(velocity * Time.deltaTime);
+                anim.SetFloat("Speed",Mathf.Abs(characterController.velocity.x));
+            } else {
+                impact.y += Physics.gravity.y * Time.deltaTime;
+                characterController.Move(impact * Time.deltaTime);
+                if ( Time.time - knockBackTime >= 0.5f )
+                    knockBack = false;
+            }
+            CheckIfOnGround();
         }
-        CheckIfOnGround();
     }
 
     public void SetPet(Pet p){
         DebugWindow.LogSystem(GetType().Name,System.Reflection.MethodBase.GetCurrentMethod().Name);
         pet = p;
+        speed = pet.movtSpd;
         characterController = p.GetComponent<CharacterController>();
         anim = pet.GetComponent<Animator>();
     }

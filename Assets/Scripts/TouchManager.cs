@@ -38,6 +38,7 @@ public class TouchManager : MonoBehaviour {
         startTime = Time.time;
     }
     void Update(){
+        #region Mobile
         if ( Application.isMobilePlatform ){
             if ( Input.touchCount > 0 ){
                 Touch touch = Input.touches[0];
@@ -54,7 +55,7 @@ public class TouchManager : MonoBehaviour {
                             if ( si != null ) si.OnEnter();
                         #endregion
                         #region Move Camera
-                        } else if ( !PlayerControls.instance.gameObject.activeSelf ){
+                        } else if ( PlayerControls.instance.pet == null ){
                             if ( camera_onClickMove ){
                                 CameraControls.instance.Move(Camera.main.ScreenToWorldPoint(Input.mousePosition));
                             } else {
@@ -92,7 +93,7 @@ public class TouchManager : MonoBehaviour {
                                 si.OnDrag();
                             }
                         }
-                    } else if ( !PlayerControls.instance.gameObject.activeSelf ){
+                    } else if ( PlayerControls.instance.pet == null ){
                     #endregion
                     #region Move Camera
                         if ( !camera_onClickMove && !InDeadZone() ){
@@ -129,6 +130,8 @@ public class TouchManager : MonoBehaviour {
                 }
             }
         } else {
+        #endregion
+        #region Editor/PC
             if ( Input.GetMouseButtonDown(0) ){
                 if ( !InDeadZone() ){
                     #region Selecting an object
@@ -142,7 +145,7 @@ public class TouchManager : MonoBehaviour {
                         if ( si != null ) si.OnEnter();
                     #endregion
                     #region Move Camera
-                    } else if ( !PlayerControls.instance.gameObject.activeSelf ){
+                    } else if ( PlayerControls.instance.pet == null ){
                         if ( camera_onClickMove ){
                             CameraControls.instance.Move(Camera.main.ScreenToWorldPoint(Input.mousePosition));
                         } else {
@@ -180,7 +183,7 @@ public class TouchManager : MonoBehaviour {
                             si.OnDrag();
                         }
                     }
-                } else if ( !PlayerControls.instance.gameObject.activeSelf ){
+                } else if ( PlayerControls.instance.pet == null ){
                 #endregion
                 #region Move Camera
                     if ( !camera_onClickMove && !InDeadZone() ){
@@ -216,6 +219,7 @@ public class TouchManager : MonoBehaviour {
                 }
             }
         }
+        #endregion
     }
 
     private Interactable GetInteractable(){

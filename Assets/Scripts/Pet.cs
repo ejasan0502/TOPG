@@ -5,16 +5,48 @@ using System.Collections;
 [RequireComponent(typeof(Interactable))]
 public class Pet : MonoBehaviour, Character {
     
-    public float attackRange = 3f;
+    public string description = "";
+    public float movtSpd = 5f;
+    public float attackRange = 2f;
     public GameObject mesh;
     public Transform weaponPos;
     public Transform hatPos;
 
     public Stats currentStats;
-    public Stats maxStats;
+    public Stats maxStats = new Stats(
+        100f,
+        1f,
+        0f,
+        100f,
+        100f,
+        100f,
+        100f,
+        100f,
+        100f
+    );
 
-    public Stats statDrain;
-    public Stats statDrainFrequency;
+    public Stats statDrain = new Stats(
+        0f,
+        0f,
+        0f,
+        0.15f,
+        0.3f,
+        0.1f,
+        0.3f,
+        0f,
+        -0.1f
+    );
+    public Stats statDrainFrequency = new Stats(
+        0f,
+        0f,
+        0f,
+        5f,
+        3f,
+        10f,
+        3f,
+        0f,
+        1f
+    );
 
     public LevelStat[] levelStats = new LevelStat[3]{
         new LevelStat("attacking",1,0),

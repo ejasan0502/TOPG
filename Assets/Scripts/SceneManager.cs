@@ -24,6 +24,8 @@ public class SceneManager : MonoBehaviour {
     private Scene currentScene = null;
     private Scene playerScene = null;
 
+    public bool isNewPlayer = true;
+
     void Start(){
         DebugWindow.LogSystem(GetType().Name,System.Reflection.MethodBase.GetCurrentMethod().Name);
         LoadData();
@@ -36,6 +38,7 @@ public class SceneManager : MonoBehaviour {
 
         XmlDocument xmlDoc = new XmlDocument();
         if ( File.Exists(Application.persistentDataPath+"/PlayerScene") ){
+            isNewPlayer = false;
             xmlDoc.Load(Application.persistentDataPath+"/PlayerScene");
         } else {
             TextAsset textAsset = (TextAsset) Resources.Load<TextAsset>("Data/playerscene");

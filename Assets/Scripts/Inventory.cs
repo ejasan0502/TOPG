@@ -20,31 +20,44 @@ public class Inventory {
             if ( inventoryItem.amt > 99 ){
                 items.Add(new InventoryItem(_item,inventoryItem.amt-99));
                 inventoryItem.amt = 99;
+                if ( InventoryHud.instance != null ){
+                    InventoryHud.instance.UpdateInventoryItem(items.Count-1);
+                    InventoryHud.instance.UpdateInventoryItem(inventoryItem);
+                }
             }
         } else {
-            items.Add(new InventoryItem(_item,_amt));
+            int x = GetEmptyInventoryIndex();
+            if ( x != -1 ){
+                items[x] = new InventoryItem(_item,_amt);
+                if ( InventoryHud.instance != null ) InventoryHud.instance.UpdateInventoryItem(x);
+            } else {
+                items.Add(new InventoryItem(_item,_amt));
+                if ( InventoryHud.instance != null ) InventoryHud.instance.UpdateInventoryItem(items.Count-1);
+            }
         }
     }
     public void Remove(Item _item, int _amt){
         DebugWindow.LogSystem(GetType().Name,System.Reflection.MethodBase.GetCurrentMethod().Name);
         InventoryItem inventoryItem = GetInventoryItem(_item);
-        if ( inventoryItem != null && inventoryItem.item.stackable ){
+        if ( DebugWindow.Assert(inventoryItem == null,"InventoryItem not found") ) return;
+        if ( inventoryItem.item.stackable ){
             inventoryItem.amt -= _amt;
             if ( inventoryItem.amt < 1 ){
-                items.Remove(inventoryItem);
+                items[GetInventoryIndex(inventoryItem)] = null;
             }
         } else {
-            items.Remove(inventoryItem);
+            items[GetInventoryIndex(inventoryItem)] = null;
         }
+        InventoryHud.instance.UpdateInventoryItem(inventoryItem);
     }
     public void Remove(int index, int amt){
         DebugWindow.LogSystem(GetType().Name,System.Reflection.MethodBase.GetCurrentMethod().Name);
         if ( index < items.Count && items[index] != null ){
             items[index].amt -= amt;
             if ( items[index].amt < 1 ){
-                items.RemoveAt(index);
+                items[index] = null;
             }
-            InventoryHud.instance.Refresh();
+            InventoryHud.instance.UpdateInventoryItem(index);
         }
     }
 
@@ -76,6 +89,21 @@ public class Inventory {
         }
 
         return null;
+    }
+    private int GetEmptyInventoryIndex(){
+        for (int i = 0; i < items.Count; i++){
+            if ( items[i] == null ){
+                return i;
+            }
+        }
+        return -1;
+    }
+    public int GetInventoryIndex(InventoryItem ii){
+        for (int i = 0; i < items.Count; i++){
+            if ( items[i] == ii )
+                return i;
+        }
+        return -1;
     }
 }
 

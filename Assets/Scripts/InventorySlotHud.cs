@@ -8,11 +8,16 @@ public class InventorySlotHud : MonoBehaviour {
 
     public void Set(InventoryItem ii){
         DebugWindow.LogSystem(GetType().Name,System.Reflection.MethodBase.GetCurrentMethod().Name);
-        icon.sprite = ii.item.icon;
-        if ( ii.amt == 1 )
+        if ( ii == null ){
+            icon.sprite = null;
             amt.text = "";
-        else
-            amt.text = ii.amt+"";
+        } else {
+            icon.sprite = ii.item.icon;
+            if ( ii.amt == 1 )
+                amt.text = "";
+            else
+                amt.text = ii.amt+"";
+        }
     }
 
     public void Clear(){

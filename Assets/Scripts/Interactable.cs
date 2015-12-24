@@ -21,5 +21,6 @@ public class Interactable : MonoBehaviour {
 public enum InteractType {
     draggable,
     pet,
-    petSelect
+    petSelect,
+    other
 }

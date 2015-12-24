@@ -87,4 +87,16 @@ public class InventoryHud : MonoBehaviour {
         ClearInventorySlots();
         FillInventorySlots();
     }
+    public void UpdateInventoryItem(int index){
+        DebugWindow.LogSystem(GetType().Name,System.Reflection.MethodBase.GetCurrentMethod().Name);
+
+        Inventory inv = GameManager.instance.player.inventory;
+        if ( DebugWindow.Assert(index >= inv.items.Count,"Invalid index, " + index) ) return;
+
+        InventoryItem ii = inv.items[index];
+        inventorySlots[index].Set(ii);
+    }
+    public void UpdateInventoryItem(InventoryItem ii){
+        UpdateInventoryItem(GameManager.instance.player.inventory.GetInventoryIndex(ii));
+    }
 }

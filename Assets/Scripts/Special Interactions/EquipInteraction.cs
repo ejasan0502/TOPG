@@ -4,11 +4,8 @@ using System.Collections;
 public class EquipInteraction : MonoBehaviour, SpecialInteraction {
     public int slotIndex;
 
-    private Vector3 originPos;
-
     void Start(){
         DebugWindow.LogSystem(GetType().Name,System.Reflection.MethodBase.GetCurrentMethod().Name);
-        originPos = transform.position;
     }
 
     public void RemoveSelf(){
@@ -34,7 +31,6 @@ public class EquipInteraction : MonoBehaviour, SpecialInteraction {
                     p.Equip(slotIndex);
                 }
             }
-            transform.position = originPos;
         }
     }
 }

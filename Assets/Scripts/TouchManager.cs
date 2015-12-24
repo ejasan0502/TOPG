@@ -24,6 +24,7 @@ public class TouchManager : MonoBehaviour {
 
     private Interactable selectedObj = null;
     private Vector3 prevMousePos = Vector3.zero;
+    private Vector3 originPos = Vector3.zero;
     private float startTime = 0f;
     private int siblingIndex = 0;
 
@@ -73,8 +74,10 @@ public class TouchManager : MonoBehaviour {
         DebugWindow.LogSystem(GetType().Name,System.Reflection.MethodBase.GetCurrentMethod().Name);
         if ( !InDeadZone() ){
             #region Selecting an object
+            selectedObj = GetInteractable();
             if ( selectedObj != null ){
                 if ( selectedObj.isDraggable ){
+                    originPos = selectedObj.transform.position;
                     siblingIndex = selectedObj.transform.GetSiblingIndex();
                     selectedObj.transform.SetAsLastSibling();
                 }
@@ -86,8 +89,6 @@ public class TouchManager : MonoBehaviour {
             } else if ( PlayerControls.instance.pet == null ){
                 if ( camera_onClickMove ){
                     CameraControls.instance.Move(Camera.main.ScreenToWorldPoint(Input.mousePosition));
-                } else {
-                    selectedObj = GetInteractable();
                 }
             }
             #endregion
@@ -137,6 +138,7 @@ public class TouchManager : MonoBehaviour {
         if ( selectedObj != null ){
             if ( selectedObj.isDraggable ){
                 selectedObj.transform.SetSiblingIndex(siblingIndex);
+                selectedObj.transform.position = originPos;
             } else if ( selectedObj.isPet  && !petting ){
                 petInfo.transform.GetChild(0).GetComponent<PetStatsHud>().pet = selectedObj.GetComponent<Pet>();
                 petInfo.SetActive(!petInfo.activeSelf);

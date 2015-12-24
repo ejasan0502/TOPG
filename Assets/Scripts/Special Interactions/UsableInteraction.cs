@@ -4,11 +4,8 @@ using System.Collections;
 public class UsableInteraction : MonoBehaviour, SpecialInteraction {
     public int slotIndex;
 
-    private Vector3 originPos;
-
     void Start(){
         DebugWindow.LogSystem(GetType().Name,System.Reflection.MethodBase.GetCurrentMethod().Name);
-        originPos = transform.position;
     }
 
     public void RemoveSelf(){
@@ -33,7 +30,6 @@ public class UsableInteraction : MonoBehaviour, SpecialInteraction {
                     p.anim.SetBool("Eat",true);
                 }
             }
-            transform.position = originPos;
         }
     }
 }

@@ -26,17 +26,25 @@ public class ContentData {
 
     public Item GetItem(string id){
         DebugWindow.LogSystem(GetType().Name,System.Reflection.MethodBase.GetCurrentMethod().Name);
-        foreach (Item i in materials){
-            if ( i.id == id )
-                return i;
-        }
+
+        int index = int.Parse(id.Split('-')[1]);
+        switch( id.ToLower()[0] ){
+        case 'e':
         foreach (Equip e in equips){
-            if ( e.id == id )
+            if ( e.id.ToLower() == id.ToLower() )
                 return e;
         }
+        break;
+        case 'u':
         foreach (Usable u in usables){
-            if ( u.id == id )
+            if ( u.id.ToLower() == id.ToLower() )
                 return u;
+        }
+        break;
+        case 'm':
+        if ( index < materials.Count )
+            return materials[index];
+        break;
         }
 
         return null;
@@ -132,3 +140,6 @@ public class ContentData {
     }
 
 }
+
+// Note
+// Rarer loot is at bottom of list

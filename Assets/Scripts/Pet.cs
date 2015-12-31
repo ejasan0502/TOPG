@@ -93,6 +93,8 @@ public class Pet : MonoBehaviour, Character {
         }
     }
 
+    public GameObject onLadder = null;
+
     private float invincibilityStartTime = 0f;
     private float invincibilityFrequency = 3f;
 
@@ -303,9 +305,12 @@ public class Pet : MonoBehaviour, Character {
             }
         }
     }
-
     private void Death(){
         DebugWindow.LogSystem(GetType().Name,System.Reflection.MethodBase.GetCurrentMethod().Name);
+    }
+
+    public void SetCollisionIgnoreWithPlatforms(bool b){
+        Physics.IgnoreLayerCollision(LayerMask.NameToLayer("Character"),LayerMask.NameToLayer("Ground"),b);
     }
 }
 

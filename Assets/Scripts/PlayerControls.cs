@@ -7,7 +7,7 @@ public class PlayerControls : MonoBehaviour {
     public Pet pet;
     public float speed = 5f;
     public float jumpForce = 10f;
-    public float freeFallDuration = 3f;
+    public float freeFallDuration = 1f;
     public GameObject petInfo;
     public GameObject petHud;
 
@@ -23,6 +23,8 @@ public class PlayerControls : MonoBehaviour {
     public bool knockBack = false;
     private Vector3 impact = Vector3.zero;
     private float knockBackTime;
+    public bool climbing = false;
+    public bool fromTop = false;
 
     private static Object lockObject = new Object();
     private static PlayerControls _instance;
@@ -74,13 +76,25 @@ public class PlayerControls : MonoBehaviour {
                 if ( Input.GetMouseButtonUp(0) ){
                     OnAttackUp();
                 }
+                if ( Input.GetKey(KeyCode.W) ){
+                    MoveUp();
+                }
+                if ( Input.GetKey(KeyCode.S) ){
+                    MoveDown();
+                }
+                if ( Input.GetKeyUp(KeyCode.W) ){
+                    OnClimbEnd();
+                }
+                if ( Input.GetKeyUp(KeyCode.S) ){
+                    OnClimbEnd();
+                }
             }
         }
     }
     void LateUpdate(){
         if ( pet != null ){
             if ( !knockBack ){
-                if ( freeFalling ) velocity.y += Physics.gravity.y * Time.deltaTime;
+                if ( freeFalling && !climbing ) velocity.y += Physics.gravity.y * Time.deltaTime;
                 characterController.Move(velocity * Time.deltaTime);
                 anim.SetFloat("Speed",Mathf.Abs(characterController.velocity.x));
             } else {
@@ -90,6 +104,10 @@ public class PlayerControls : MonoBehaviour {
                     knockBack = false;
             }
             CheckIfOnGround();
+            if ( climbing && isGrounded || pet.onLadder == null ){
+                climbing = false;
+                pet.SetCollisionIgnoreWithPlatforms(false);
+            }
         }
     }
 
@@ -101,27 +119,59 @@ public class PlayerControls : MonoBehaviour {
         anim = pet.GetComponent<Animator>();
     }
     public void MoveLeft(){
-        if ( pet != null && !attacking ){
+        if ( pet != null && !attacking && !climbing ){
             velocity.x = 0f;
             pet.transform.LookAt(Vector3.left+pet.transform.position);
             velocity.x = pet.transform.forward.x*speed;
         }
     }
     public void MoveRight(){
-        if ( pet != null && !attacking ){
+        if ( pet != null && !attacking && !climbing ){
             velocity.x = 0f;
             pet.transform.LookAt(Vector3.right+pet.transform.position);
             velocity.x = pet.transform.forward.x*speed;
         }
     }
+    public void MoveUp(){
+        if ( pet != null && pet.onLadder ){
+            climbing = true;
+            velocity.y = pet.movtSpd;
+            pet.transform.position = new Vector3(pet.onLadder.transform.position.x,pet.transform.position.y,-0.25f);
+            pet.transform.LookAt(pet.transform.position+Vector3.forward);
+            pet.SetCollisionIgnoreWithPlatforms(true);
+            anim.SetFloat("Speed",Mathf.Abs(characterController.velocity.y));
+        }
+    }
+    public void MoveDown(){
+        if ( pet != null ){
+            if ( pet.onLadder && (!isGrounded || fromTop) ){
+                climbing = true;
+                velocity.y = -pet.movtSpd;
+                pet.transform.position = new Vector3(pet.onLadder.transform.position.x,pet.transform.position.y,-0.25f);
+                pet.transform.LookAt(pet.transform.position+Vector3.forward);
+                pet.SetCollisionIgnoreWithPlatforms(true);
+                anim.SetFloat("Speed",Mathf.Abs(characterController.velocity.y));
+                fromTop = false;
+            }
+        }
+    }
     public void OnMoveUp(){
         velocity.x = 0f;
+    }
+    public void OnClimbEnd(){
+        velocity.y = 0f;
     }
     public void Jump(){
         if ( pet != null && isGrounded && !attacking ){
             velocity.y = jumpForce;
             anim.SetBool("Jump",true);
         }
+    }
+    public void JumpLadderLeft(){
+        
+    }
+    public void JumpLadderRight(){
+
     }
     public void OnAttackDown(){
         if ( pet == null ) return;
@@ -149,7 +199,7 @@ public class PlayerControls : MonoBehaviour {
         if ( Physics.Raycast(pet.transform.position,pet.transform.TransformDirection(Vector3.down),out hit,0.1f, 1 << LayerMask.NameToLayer("Ground"))){
             isGrounded = true;
             freeFalling = false;
-            anim.SetBool("Jump",false);
+            if ( !climbing ) anim.SetBool("Jump",false);
         } else {
             isGrounded = false;
             if ( !freeFalling ){
@@ -157,7 +207,7 @@ public class PlayerControls : MonoBehaviour {
                 freeFallTime = Time.time;
                 velocity.y = characterController.velocity.y;
             } else if ( Time.time - freeFallTime >= freeFallDuration ){
-                anim.SetBool("Jump",true);
+                if ( !climbing ) anim.SetBool("Jump",true);
             }
         }
     }

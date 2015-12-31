@@ -15,8 +15,14 @@ public class GameManager : MonoBehaviour {
         get {
             lock(lockObj){
                 if ( _instance == null ){
-                    GameObject o = new GameObject("GameManager");
-                    _instance = o.AddComponent<GameManager>();
+                    GameObject o = GameObject.Find("GameManager");
+
+                    if ( o == null ){
+                        o = new GameObject("GameManager");
+                        _instance = o.AddComponent<GameManager>();
+                    } else {
+                        _instance = o.GetComponent<GameManager>();
+                    }
                 }
             }
             return _instance;

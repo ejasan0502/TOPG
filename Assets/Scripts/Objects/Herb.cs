@@ -19,7 +19,8 @@ public class Herb : MonoBehaviour, Character {
     }
 
     public void Hit(float dmg, Character c){
-        
+        DebugWindow.LogSystem(GetType().Name,System.Reflection.MethodBase.GetCurrentMethod().Name);
+        Destroy(gameObject);
     }
     public void OnAttackEnd(){
 

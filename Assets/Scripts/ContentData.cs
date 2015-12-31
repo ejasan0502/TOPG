@@ -49,7 +49,29 @@ public class ContentData {
 
         return null;
     }
+    public List<InventoryItem> GetRandomItems(int count){
+        List<InventoryItem> itemList = new List<InventoryItem>();
 
+        for (int i = 0; i < count; i++){
+            if ( Random.Range(0,100) <= 50f ){
+                int x = Random.Range(0,usables.Count-1);
+                int y = ListContains(itemList,usables[x]);
+                if ( y != -1 )
+                    itemList[y].amt++;
+                else
+                    itemList.Add(new InventoryItem(usables[x],1));
+            } else {
+                int x = Random.Range(0,equips.Count-1);
+                int y = ListContains(itemList,equips[x]);
+                if ( y != -1 )
+                    itemList[y].amt++;
+                else
+                    itemList.Add(new InventoryItem(equips[x],1));
+            }
+        }
+
+        return itemList;
+    }
     private void LoadData(){
         DebugWindow.LogSystem(GetType().Name,System.Reflection.MethodBase.GetCurrentMethod().Name);
         for (int i = 0; i < paths.Length; i++){
@@ -138,7 +160,14 @@ public class ContentData {
              }
         }
     }
+    private int ListContains(List<InventoryItem> list, Item item){
+        for (int i = 0; i < list.Count; i++){
+            if ( list[i].item.id == item.id )
+                return i;
+        }
 
+        return -1;
+    }
 }
 
 // Note

@@ -7,10 +7,12 @@ public class Player {
     
     public List<Pet> pets;
     public Inventory inventory;
+    public int crystals;
 
     public Player(){
         pets = new List<Pet>();
         inventory = new Inventory();
+        crystals = 0;
     }
 
     public void AddPet(Pet p){

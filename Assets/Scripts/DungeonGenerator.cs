@@ -54,6 +54,8 @@ public class DungeonGenerator : MonoBehaviour {
     private IEnumerator GenerateMap(string s){
         DebugWindow.LogSystem(GetType().Name,System.Reflection.MethodBase.GetCurrentMethod().Name);
 
+        yield return new WaitForSeconds(1f);
+
         startTime = Time.time;
         mapType = s;
         DebugWindow.Assert(mapType == "gathering" || mapType == "mining","Do not recognize map type.");
@@ -293,6 +295,10 @@ public class DungeonGenerator : MonoBehaviour {
             pos.y = b.max.y;
             if ( Random.Range(0,100) <= chestChance*difficulty ){
                 obj = Instantiate(chest);
+
+                Chest c = obj.GetComponent<Chest>();
+                List<InventoryItem> items = GameManager.instance.contentData.GetRandomItems(difficulty*3);
+                c.Initialize(items,Random.Range(difficulty,difficulty*10));
             } else if ( mapType == "gathering" && Random.Range(0,100) <= herbChance ){
                 obj = Instantiate(herb);
                 pos.y = b.max.y + obj.GetComponent<Renderer>().bounds.size.y/2.0f;

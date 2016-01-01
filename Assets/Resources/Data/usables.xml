@@ -15,4 +15,12 @@
 		<Stats>thirsty-30</Stats>
 		<UsableType>add</UsableType>
 	</Usable>
+  <Usable>
+    <Name>Berries</Name>
+    <Id>uadd-2</Id>
+    <Description>A handful of edible berries.</Description>
+    <Icon>Content/Icons/Usables/Berries</Icon>
+    <Stats>hungry-5,thirsty-3</Stats>
+    <UsableType>add</UsableType>
+  </Usable>
 </Usables>

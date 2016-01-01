@@ -301,10 +301,11 @@ public class DungeonGenerator : MonoBehaviour {
                 c.Initialize(items,Random.Range(difficulty,difficulty*10));
             } else if ( mapType == "gathering" && Random.Range(0,100) <= herbChance ){
                 obj = Instantiate(herb);
+                obj.GetComponent<Herb>().item = new InventoryItem(GameManager.instance.contentData.GetItem("uadd-2"),Random.Range(difficulty,difficulty*3));
                 pos.y = b.max.y + obj.GetComponent<Renderer>().bounds.size.y/2.0f;
             } else if ( mapType == "mining" && Random.Range(0,100) <= oreChance ){
                 obj = Instantiate(ore);
-                pos.y = b.max.y + obj.GetComponent<Renderer>().bounds.size.y/2.0f;
+                obj.GetComponent<Ore>().item = new InventoryItem(GameManager.instance.contentData.GetItem("m-1"),Random.Range(difficulty,difficulty*3));
             }
 
             if ( obj != null ){

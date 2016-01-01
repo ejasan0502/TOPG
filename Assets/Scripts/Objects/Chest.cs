@@ -34,11 +34,20 @@ public class Chest : MonoBehaviour, Character {
         if ( !opened && pet != null ){ 
             GetComponent<Animation>().Play();
             
-            Player p = GameManager.instance.player;
-            p.crystals += crystals;
-            foreach (InventoryItem i in items){
-                p.inventory.Add(i.item,i.amt);
+            GameObject o;
+            Vector3 pos;
+            foreach (InventoryItem ii in items){
+                o = (GameObject) Instantiate(Resources.Load("SceneObjects/PickupItem"));
+                o.GetComponent<Pickup>().Initialize(ii);
+                pos = transform.position;
+                pos.y += 0.5f;
+                o.transform.position = pos;
             }
+            o = (GameObject) Instantiate(Resources.Load("SceneObjects/PickupCrystal"));
+            o.GetComponent<Pickup>().Initialize(crystals);
+            pos = transform.position;
+            pos.y += 0.5f;
+            o.transform.position = pos;
 
             opened = true;
         }

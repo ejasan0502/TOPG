@@ -5,6 +5,7 @@ using System.Collections;
 [RequireComponent(typeof(Interactable))]
 public class Pet : MonoBehaviour, Character {
     
+    #region Modifiable Variables
     public string description = "";
     public float movtSpd = 5f;
     public float attackRange = 2f;
@@ -59,24 +60,31 @@ public class Pet : MonoBehaviour, Character {
         null,
         null
     };
+    #endregion
+    #region Private Variables
+    [HideInInspector] public Animator anim;
+    [HideInInspector] public PlayerControls playerControls;
+    [HideInInspector] public Vector3 wanderPos;
+    [HideInInspector] public bool selected = false;
+    [HideInInspector] public bool isGrounded = false;
+    [HideInInspector] public GameObject onLadder = null;
 
     private Material bodyMaterial;
     private float[] drainTime;
     private FieldInfo[] statFields;
     private State state = State.idle;
-    [HideInInspector] public Animator anim;
     private GameObject primaryWeapon = null;
-    [HideInInspector] public PlayerControls playerControls;
 
     private CharacterController characterController;
     private Renderer ground = null;
     private float wanderTime;
     private float wanderFrequency = 3f;
-    public Vector3 wanderPos;
     private Vector3 velocity = Vector3.zero;
-    [HideInInspector] public bool selected = false;
-    public bool isGrounded = false;
-    
+
+    private float invincibilityStartTime = 0f;
+    private float invincibilityFrequency = 3f;
+    #endregion
+    #region Character Interface Variables
     public bool isAlive {
         get {
             return currentStats.health > 0;
@@ -92,12 +100,9 @@ public class Pet : MonoBehaviour, Character {
             return gameObject;
         }
     }
+    #endregion
 
-    public GameObject onLadder = null;
-
-    private float invincibilityStartTime = 0f;
-    private float invincibilityFrequency = 3f;
-
+    #region Unity Methods
     void Start(){
         DebugWindow.LogSystem(GetType().Name,System.Reflection.MethodBase.GetCurrentMethod().Name);
         currentStats = new Stats(maxStats);
@@ -152,22 +157,29 @@ public class Pet : MonoBehaviour, Character {
             }
         }
     }
-
-    private void UpdateEquipStats(){
+    void OnTriggerEnter(Collider other){
         DebugWindow.LogSystem(GetType().Name,System.Reflection.MethodBase.GetCurrentMethod().Name);
-        maxStats.baseDmg = 1f;
-        maxStats.baseDef = 0f;
-
-        foreach (Equip e in equipment){
-            if ( e != null ){
-                maxStats.baseDmg += e.baseDmg;
-                maxStats.baseDef += e.baseDef;
-            }
+        if ( other.gameObject.layer == LayerMask.NameToLayer("Ladder") ){
+            onLadder = other.gameObject;
+            if ( transform.position.y >= other.gameObject.transform.position.y )
+                PlayerControls.instance.fromTop = true; 
+        } else if ( other.gameObject.layer == LayerMask.NameToLayer("Pickup") ){
+            other.GetComponent<Pickup>().Interact();
         }
-
-        currentStats.baseDmg = maxStats.baseDmg;
-        currentStats.baseDef = maxStats.baseDef;
     }
+    void OnTriggerExit(Collider other){
+        DebugWindow.LogSystem(GetType().Name,System.Reflection.MethodBase.GetCurrentMethod().Name);
+        if ( other.gameObject.layer == LayerMask.NameToLayer("Ladder") ){
+            onLadder = null;
+            transform.position = new Vector3(transform.position.x,transform.position.y,0f);
+            SetCollisionIgnoreWithPlatforms(false);
+            PlayerControls.instance.velocity *= 0.5f;
+        } else if ( other.gameObject.layer == LayerMask.NameToLayer("Pickup") ){
+
+        }
+    }
+    #endregion
+    #region AI Methods
     private void Wander(){
         if ( ground != null ){
             velocity.x = 0f;
@@ -207,13 +219,29 @@ public class Pet : MonoBehaviour, Character {
             anim.SetFloat("Speed",Mathf.Abs(velocity.x));
         }
     }
-
     public void BePetted(){
         DebugWindow.LogSystem(GetType().Name,System.Reflection.MethodBase.GetCurrentMethod().Name);
         currentStats.happy += 5f;
         if ( currentStats.happy > maxStats.happy ){
             currentStats.happy = maxStats.happy;
         }
+    }
+    #endregion
+    #region Modify Stats Methods
+    private void UpdateEquipStats(){
+        DebugWindow.LogSystem(GetType().Name,System.Reflection.MethodBase.GetCurrentMethod().Name);
+        maxStats.baseDmg = 1f;
+        maxStats.baseDef = 0f;
+
+        foreach (Equip e in equipment){
+            if ( e != null ){
+                maxStats.baseDmg += e.baseDmg;
+                maxStats.baseDef += e.baseDef;
+            }
+        }
+
+        currentStats.baseDmg = maxStats.baseDmg;
+        currentStats.baseDef = maxStats.baseDef;
     }
     public void Equip(int slotIndex){
         DebugWindow.LogSystem(GetType().Name,System.Reflection.MethodBase.GetCurrentMethod().Name);
@@ -277,7 +305,8 @@ public class Pet : MonoBehaviour, Character {
                 current[i].SetValue(currentStats, 0f);
         }
     }
-
+    #endregion
+    #region Character Interface Methods
     public void Hit(float dmg, Character c){
         if ( !isAlive ) return;
         if ( Time.time - invincibilityStartTime >= invincibilityFrequency ){
@@ -308,6 +337,7 @@ public class Pet : MonoBehaviour, Character {
     private void Death(){
         DebugWindow.LogSystem(GetType().Name,System.Reflection.MethodBase.GetCurrentMethod().Name);
     }
+    #endregion
 
     public void SetCollisionIgnoreWithPlatforms(bool b){
         Physics.IgnoreLayerCollision(LayerMask.NameToLayer("Character"),LayerMask.NameToLayer("Ground"),b);

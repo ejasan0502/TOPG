@@ -10,15 +10,19 @@ public class RepeatButtonUI : MonoBehaviour, IPointerEnterHandler, IPointerDownH
     private bool pressed = false;
 
     public void OnPointerEnter(PointerEventData eventData){
+        DebugWindow.LogSystem(GetType().Name,System.Reflection.MethodBase.GetCurrentMethod().Name);
         pressed = true;
     }   
     public void OnPointerDown(PointerEventData eventData){
+        DebugWindow.LogSystem(GetType().Name,System.Reflection.MethodBase.GetCurrentMethod().Name);
         pressed = true;   
     }
     public void OnPointerUp(PointerEventData eventData){
+        DebugWindow.LogSystem(GetType().Name,System.Reflection.MethodBase.GetCurrentMethod().Name);
         pressed = false;
     }
     public void OnPointerExit(PointerEventData eventData){
+        DebugWindow.LogSystem(GetType().Name,System.Reflection.MethodBase.GetCurrentMethod().Name);
         pressed = false;
     }
 

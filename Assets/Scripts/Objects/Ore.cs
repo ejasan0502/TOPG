@@ -27,9 +27,14 @@ public class Ore : MonoBehaviour, Character {
         if ( item != null ){
             GameObject o = (GameObject) Instantiate(Resources.Load("SceneObjects/PickupItem"));
             o.GetComponent<Pickup>().Initialize(item);
-            Vector3 pos = transform.position;
-            pos.y += 0.5f;
-            o.transform.position = pos;
+            o.transform.position = transform.position;
+
+            RaycastHit hit;
+            if ( Physics.Raycast(transform.position,transform.TransformDirection(Vector3.up),out hit,1000f,1 << LayerMask.NameToLayer("Ground")) ){
+                Vector3 pos = hit.point;
+                pos.y += 0.5f;
+                o.transform.position = pos;
+            }
             Destroy(gameObject);
         }
     }

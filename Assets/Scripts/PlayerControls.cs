@@ -4,6 +4,7 @@ using System.Collections;
 
 public class PlayerControls : MonoBehaviour {
     
+    public bool testingMobile = false;
     public Pet pet;
     public float speed = 5f;
     public float jumpForce = 10f;
@@ -46,14 +47,14 @@ public class PlayerControls : MonoBehaviour {
             anim = pet.GetComponent<Animator>();
         }
 
-        if ( !Application.isMobilePlatform ){
+        if ( !Application.isMobilePlatform && !testingMobile ){
             foreach (Transform t in transform){
                 t.gameObject.SetActive(false);
             }
         }
     }
     void Update(){
-        if ( !Application.isMobilePlatform ){
+        if ( !Application.isMobilePlatform && !testingMobile ){
             if ( !petInfo.activeSelf ){
                 if ( Input.GetKey(KeyCode.A) ){
                     MoveLeft();
@@ -96,7 +97,10 @@ public class PlayerControls : MonoBehaviour {
             if ( !knockBack ){
                 if ( freeFalling && !climbing ) velocity.y += Physics.gravity.y * Time.deltaTime;
                 characterController.Move(velocity * Time.deltaTime);
-                anim.SetFloat("Speed",Mathf.Abs(characterController.velocity.x));
+                if ( climbing )
+                    anim.SetFloat("Speed",Mathf.Abs(characterController.velocity.y));
+                else
+                    anim.SetFloat("Speed",Mathf.Abs(characterController.velocity.x));
             } else {
                 impact.y += Physics.gravity.y * Time.deltaTime;
                 characterController.Move(impact * Time.deltaTime);
@@ -134,23 +138,21 @@ public class PlayerControls : MonoBehaviour {
     }
     public void MoveUp(){
         if ( pet != null && pet.onLadder ){
-            climbing = true;
             velocity.y = pet.movtSpd;
+            climbing = true;
             pet.transform.position = new Vector3(pet.onLadder.transform.position.x,pet.transform.position.y,-0.25f);
             pet.transform.LookAt(pet.transform.position+Vector3.forward);
             pet.SetCollisionIgnoreWithPlatforms(true);
-            anim.SetFloat("Speed",Mathf.Abs(characterController.velocity.y));
         }
     }
     public void MoveDown(){
         if ( pet != null ){
             if ( pet.onLadder && (!isGrounded || fromTop) ){
-                climbing = true;
                 velocity.y = -pet.movtSpd;
+                climbing = true;
                 pet.transform.position = new Vector3(pet.onLadder.transform.position.x,pet.transform.position.y,-0.25f);
                 pet.transform.LookAt(pet.transform.position+Vector3.forward);
                 pet.SetCollisionIgnoreWithPlatforms(true);
-                anim.SetFloat("Speed",Mathf.Abs(characterController.velocity.y));
                 fromTop = false;
             }
         }

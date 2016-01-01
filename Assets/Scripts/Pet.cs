@@ -158,17 +158,15 @@ public class Pet : MonoBehaviour, Character {
         }
     }
     void OnTriggerEnter(Collider other){
-        DebugWindow.LogSystem(GetType().Name,System.Reflection.MethodBase.GetCurrentMethod().Name);
         if ( other.gameObject.layer == LayerMask.NameToLayer("Ladder") ){
             onLadder = other.gameObject;
             if ( transform.position.y >= other.gameObject.transform.position.y )
                 PlayerControls.instance.fromTop = true; 
         } else if ( other.gameObject.layer == LayerMask.NameToLayer("Pickup") ){
-            other.GetComponent<Pickup>().Interact();
+            other.GetComponent<Pickup>().Interact(this);
         }
     }
     void OnTriggerExit(Collider other){
-        DebugWindow.LogSystem(GetType().Name,System.Reflection.MethodBase.GetCurrentMethod().Name);
         if ( other.gameObject.layer == LayerMask.NameToLayer("Ladder") ){
             onLadder = null;
             transform.position = new Vector3(transform.position.x,transform.position.y,0f);

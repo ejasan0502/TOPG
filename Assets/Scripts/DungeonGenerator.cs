@@ -320,7 +320,6 @@ public class DungeonGenerator : MonoBehaviour {
         pos.y = b.min.y;
         RaycastHit hit;
         if ( Physics.Raycast(pos,o.transform.TransformDirection(Vector3.down),out hit,1000f,1 << LayerMask.NameToLayer("Ground")) ){
-            DebugWindow.Log(b.center.y+" "+hit.point.y);
             pos.y = b.center.y - Mathf.Abs(b.center.y-hit.point.y)/2.0f + 0.5f;
             CreateLadder(pos,new Vector3(1f,Mathf.Abs(b.center.y-hit.point.y)+0.5f,ladderZ),rectList);
         }

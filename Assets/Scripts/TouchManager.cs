@@ -71,7 +71,6 @@ public class TouchManager : MonoBehaviour {
     }
 
     private void OnEnter(){
-        DebugWindow.LogSystem(GetType().Name,System.Reflection.MethodBase.GetCurrentMethod().Name);
         if ( !InDeadZone() ){
             #region Selecting an object
             selectedObj = GetInteractable();
@@ -96,7 +95,6 @@ public class TouchManager : MonoBehaviour {
         prevMousePos = Input.mousePosition;
     }
     private void OnHold(){
-        DebugWindow.LogSystem(GetType().Name,System.Reflection.MethodBase.GetCurrentMethod().Name);
         #region An object was selected
         if ( selectedObj != null ){
             if ( selectedObj.isDraggable ){
@@ -134,7 +132,6 @@ public class TouchManager : MonoBehaviour {
         #endregion
     }
     private void OnExit(){
-        DebugWindow.LogSystem(GetType().Name,System.Reflection.MethodBase.GetCurrentMethod().Name);
         if ( selectedObj != null ){
             if ( selectedObj.isDraggable ){
                 selectedObj.transform.SetSiblingIndex(siblingIndex);

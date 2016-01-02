@@ -26,6 +26,8 @@ public class PlayerControls : MonoBehaviour {
     private float knockBackTime;
     public bool climbing = false;
     public bool fromTop = false;
+    public bool jumpLeft = false;
+    public bool jumpRight = false;
 
     private static Object lockObject = new Object();
     private static PlayerControls _instance;
@@ -97,7 +99,7 @@ public class PlayerControls : MonoBehaviour {
             if ( !knockBack ){
                 if ( freeFalling && !climbing ) velocity.y += Physics.gravity.y * Time.deltaTime;
                 characterController.Move(velocity * Time.deltaTime);
-                if ( climbing )
+                if ( climbing  && !jumpLeft && !jumpRight )
                     anim.SetFloat("Speed",Mathf.Abs(characterController.velocity.y));
                 else
                     anim.SetFloat("Speed",Mathf.Abs(characterController.velocity.x));
@@ -127,6 +129,9 @@ public class PlayerControls : MonoBehaviour {
             velocity.x = 0f;
             pet.transform.LookAt(Vector3.left+pet.transform.position);
             velocity.x = pet.transform.forward.x*speed;
+        } else if ( climbing ){
+            jumpLeft = true;
+            jumpRight = false;
         }
     }
     public void MoveRight(){
@@ -134,6 +139,9 @@ public class PlayerControls : MonoBehaviour {
             velocity.x = 0f;
             pet.transform.LookAt(Vector3.right+pet.transform.position);
             velocity.x = pet.transform.forward.x*speed;
+        } else if ( climbing ){
+            jumpLeft = false;
+            jumpRight = true;
         }
     }
     public void MoveUp(){
@@ -162,18 +170,26 @@ public class PlayerControls : MonoBehaviour {
     }
     public void OnClimbEnd(){
         velocity.y = 0f;
+        jumpLeft = false;
+        jumpRight = false;
     }
     public void Jump(){
-        if ( pet != null && isGrounded && !attacking ){
-            velocity.y = jumpForce;
-            anim.SetBool("Jump",true);
+        if ( pet != null ){
+            if ( climbing ){
+                if ( jumpLeft ){
+                    velocity.x = 0f;
+                    pet.transform.LookAt(Vector3.left+pet.transform.position);
+                    velocity.x = pet.transform.forward.x*speed;
+                } else if ( jumpRight ){
+                    velocity.x = 0f;
+                    pet.transform.LookAt(Vector3.right+pet.transform.position);
+                    velocity.x = pet.transform.forward.x*speed;
+                }
+            } else if ( isGrounded && !attacking ){
+                velocity.y = jumpForce;
+                anim.SetBool("Jump",true);
+            }
         }
-    }
-    public void JumpLadderLeft(){
-        
-    }
-    public void JumpLadderRight(){
-
     }
     public void OnAttackDown(){
         if ( pet == null ) return;

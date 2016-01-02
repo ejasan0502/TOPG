@@ -65,9 +65,6 @@ public class SceneManager : MonoBehaviour {
             playerScene.sceneObjects.Add(so);
         }
     }
-    private void Generate(string s){
-        
-    }
 
     public static void Save(){
         if ( instance.playerScene == null || instance.currentScene != instance.playerScene ) return;
@@ -129,8 +126,8 @@ public class SceneManager : MonoBehaviour {
                 instance.playerScene.gameObjects.Add(o);
             }
             instance.currentScene = instance.playerScene;
-        } else {
-            instance.Generate(s);
+        } else if ( s.ToLower().Contains("combat") ){
+            
         }
     }
 }

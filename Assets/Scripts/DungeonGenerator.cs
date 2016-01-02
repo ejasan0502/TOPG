@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 public class DungeonGenerator : MonoBehaviour {
 
+    public GameObject dirtBackground;
     public GameObject invisBlock;
     public GameObject grass;
     public GameObject dirt;
@@ -97,6 +98,18 @@ public class DungeonGenerator : MonoBehaviour {
             // Check Left
             if ( i-1 >= 0 && (i)%(difficulty*roomsPerDiff) != 0 )
                 rooms[i].neighbors.Add(rooms[i-1]);
+            // Check Top Left
+            if ( i-difficulty*roomsPerDiff-1 >= 0 && (i)%(difficulty*roomsPerDiff) != 0 )
+                rooms[i].adjacentRooms.Add(rooms[i-difficulty*roomsPerDiff-1]);
+            // Check Top Right
+            if ( i-difficulty*roomsPerDiff+1 >= 0 && i-difficulty*roomsPerDiff+1 < rooms.Count && (i-difficulty*roomsPerDiff+1)%(difficulty*roomsPerDiff) != 0 )
+                rooms[i].adjacentRooms.Add(rooms[i-difficulty*roomsPerDiff+1]);
+            // Check Bottom Left
+            if ( i+difficulty*roomsPerDiff-1 < rooms.Count && (i)%(difficulty*roomsPerDiff) != 0 )
+                rooms[i].adjacentRooms.Add(rooms[i+difficulty*roomsPerDiff-1]);
+            // Check Bottom Right
+            if ( i+difficulty*roomsPerDiff+1 < rooms.Count && (i+1)%(difficulty*roomsPerDiff) != 0 )
+                rooms[i].adjacentRooms.Add(rooms[i+difficulty*roomsPerDiff+1]);
         }   
 
         // Fill roomPath
@@ -136,7 +149,7 @@ public class DungeonGenerator : MonoBehaviour {
             if ( prevRoom == null || prevRoom != null && currentRoom.position.x >= prevRoom.position.x ){
                 if ( nextRoom == null || nextRoom != null && currentRoom.position.x >= nextRoom.position.x ){
                     GameObject r = Instantiate(dirt);
-                    r.transform.localScale = new Vector3(1f,roomSize,1f);
+                    r.transform.localScale = new Vector3(1f,roomSize,0.5f);
                     r.transform.position = new Vector3(currentRoom.position.x+roomSize/2.0f,currentRoom.position.y,0f);
                     r.name = i+"";
 
@@ -166,7 +179,7 @@ public class DungeonGenerator : MonoBehaviour {
             if ( prevRoom == null || prevRoom != null && currentRoom.position.x <= prevRoom.position.x ){
                 if ( nextRoom == null || nextRoom != null && currentRoom.position.x <= nextRoom.position.x ){
                     GameObject l = Instantiate(dirt);
-                    l.transform.localScale = new Vector3(1f,roomSize,1f);
+                    l.transform.localScale = new Vector3(1f,roomSize,0.5f);
                     l.transform.position = new Vector3(currentRoom.position.x-roomSize/2.0f,currentRoom.position.y,0f);
                     l.name = i+"";
 
@@ -178,6 +191,9 @@ public class DungeonGenerator : MonoBehaviour {
             }
         }
         
+        // Set camera bounding rect
+        CameraControls.instance.SetRect(new Rect(0f,-roomSize/2.0f,difficulty*roomSize*roomsPerDiff,difficulty*roomSize*roomsPerDiff));
+
         DebugWindow.Log("Generated map layout. Took " + (Time.time-startTime) + " secs");
         startTime = Time.time;
         #endregion
@@ -266,6 +282,28 @@ public class DungeonGenerator : MonoBehaviour {
         portalObj.transform.SetParent(transform);
 
         DebugWindow.Log("Filled map. Took " + (Time.time-startTime) + " secs");
+        startTime = Time.time;
+        #endregion
+        #region Generate backgrounds
+        foreach (RoomNode rn in roomPath){
+            foreach (RoomNode r1 in rn.neighbors){
+                if ( !roomPath.Contains(r1) ){
+                    GameObject o = (GameObject) Instantiate(dirtBackground);
+                    Vector3 position = r1.position;
+                    position.z = -1.01f;
+                    o.transform.position = position;
+                }
+            }
+            foreach (RoomNode r2 in rn.adjacentRooms){
+                if ( !roomPath.Contains(r2) ){
+                    GameObject o = (GameObject) Instantiate(dirtBackground);
+                    Vector3 position = r2.position;
+                    position.z = -1.01f;
+                    o.transform.position = position;
+                }
+            }
+        }
+        DebugWindow.Log("Generated backgrounds. Took " + (Time.time-startTime) + " secs");
         #endregion
 
         if ( testPet != null ){
@@ -347,10 +385,12 @@ public class RoomNode {
     public Vector3 position;
     public Rect rect;
     public List<RoomNode> neighbors;
+    public List<RoomNode> adjacentRooms;
 
     public RoomNode(){
         position = Vector3.zero;
         rect = new Rect();
         neighbors = new List<RoomNode>();
+        adjacentRooms = new List<RoomNode>();
     }
 }

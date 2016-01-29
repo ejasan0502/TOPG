@@ -302,6 +302,11 @@ public class DungeonGenerator : MonoBehaviour {
                     o.transform.position = position;
                 }
             }
+
+            GameObject b = (GameObject) Instantiate(dirtBackground);
+            Vector3 p = rn.position;
+            p.z += 1f;
+            b.transform.position = p;
         }
         DebugWindow.Log("Generated backgrounds. Took " + (Time.time-startTime) + " secs");
         #endregion

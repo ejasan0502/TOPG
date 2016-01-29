@@ -44,6 +44,10 @@ public class PlayerControls : MonoBehaviour {
 
     void Start(){
         DebugWindow.LogSystem(GetType().Name,System.Reflection.MethodBase.GetCurrentMethod().Name);
+
+        if ( _instance == null )
+            _instance = this;
+
         if ( pet != null ){
             characterController = pet.GetComponent<CharacterController>();
             anim = pet.GetComponent<Animator>();

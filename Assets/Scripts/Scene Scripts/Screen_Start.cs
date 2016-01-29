@@ -6,9 +6,9 @@ public class Screen_Start : MonoBehaviour {
     
     public float waitTime = 1f;
     public List<GameObject> enableList;
-    public GameObject petSelect;
 
     IEnumerator Start(){
+        yield return new WaitForSeconds(1f);
         foreach (GameObject o in enableList){
             o.SetActive(false);
         }
@@ -23,11 +23,10 @@ public class Screen_Start : MonoBehaviour {
         }
 
         if ( SceneManager.instance.isNewPlayer ){
-            petSelect.SetActive(true);
+            SceneManager.LoadScene("petselect");
         } else {
-            Destroy(petSelect.gameObject);
-            petSelect = null;
-        }   
+            SceneManager.LoadScene("playerscene");
+        }
 
         Destroy(gameObject);
     }

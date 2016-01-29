@@ -3,9 +3,14 @@ using System.Collections;
 
 public class PickupCrystal : MonoBehaviour, Pickup {
     
+    private PickupManager pickupManager;
     private int crystals = 0;
     private bool init = false;
     private Pet pet = null;
+
+    void Start(){
+        pickupManager = GameObject.FindObjectOfType<PickupManager>();
+    }
 
     void Update(){
         if ( pet != null ){
@@ -25,7 +30,8 @@ public class PickupCrystal : MonoBehaviour, Pickup {
         DebugWindow.LogSystem(GetType().Name,System.Reflection.MethodBase.GetCurrentMethod().Name);
         if ( init && pet == null  ){
             pet = p;
-            GameManager.instance.player.crystals += crystals;
+            if ( pickupManager != null ) pickupManager.Add(crystals);
+            else GameManager.instance.player.crystals += crystals;
         }
     }
 }

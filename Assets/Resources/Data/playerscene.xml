@@ -1,8 +1,8 @@
 ﻿<PlayerScene>
   <SceneObject>
-    <name>Ground</name>
-    <position>0,0,0</position>
+    <name>grass</name>
+    <position>0,-1,0</position>
     <rotation>0,0,0</rotation>
-    <scale>50,1,1</scale>
+    <scale>25,1,1</scale>
   </SceneObject>
 </PlayerScene>

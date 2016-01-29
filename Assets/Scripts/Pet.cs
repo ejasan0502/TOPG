@@ -83,6 +83,9 @@ public class Pet : MonoBehaviour, Character {
 
     private float invincibilityStartTime = 0f;
     private float invincibilityFrequency = 3f;
+
+    private Vector3? moveTo = null;
+    private bool droppingPackage = false;
     #endregion
     #region Character Interface Variables
     public bool isAlive {
@@ -136,6 +139,9 @@ public class Pet : MonoBehaviour, Character {
             case State.idle:
             Wander();
             break;
+            case State.hasPackage:
+            HasPackage();
+            break;
             }
         } else if ( selected ){
             transform.LookAt(Camera.main.transform);
@@ -164,6 +170,8 @@ public class Pet : MonoBehaviour, Character {
                 PlayerControls.instance.fromTop = true; 
         } else if ( other.gameObject.layer == LayerMask.NameToLayer("Pickup") ){
             other.GetComponent<Pickup>().Interact(this);
+        } else if ( other.gameObject.GetComponent<Portal>() != null ){
+            SceneManager.LoadScene("playerscene");
         }
     }
     void OnTriggerExit(Collider other){
@@ -178,6 +186,21 @@ public class Pet : MonoBehaviour, Character {
     }
     #endregion
     #region AI Methods
+    public void SetState(State s){
+        state = s;
+    }
+    private Transform LocateClosestChest(){
+        Transform t;
+        float distance = 100f;
+
+        foreach (PlayerChest o in GameObject.FindObjectsOfType<PlayerChest>()){
+            if ( Vector3.Distance(transform.position,o.transform.position) < distance ){
+                return o.transform;
+            }
+        }
+
+        return null;
+    }
     private void Wander(){
         if ( ground != null ){
             velocity.x = 0f;
@@ -216,6 +239,36 @@ public class Pet : MonoBehaviour, Character {
             characterController.Move(velocity * Time.deltaTime);
             anim.SetFloat("Speed",Mathf.Abs(velocity.x));
         }
+    }
+    private void HasPackage(){
+        if ( !moveTo.HasValue ){
+            Transform t = LocateClosestChest();
+            if ( t != null ){
+                Vector3 pos = t.position;
+                pos.y = transform.position.y;
+                moveTo = pos;
+
+                if ( transform.position.x - pos.x > 0 ){
+                    transform.LookAt(Vector3.right+transform.position);
+                } else {
+                    transform.LookAt(Vector3.left+transform.position);
+                }
+            }
+        } else {
+            if ( Vector3.Distance(transform.position,moveTo.Value) > 0.5f ) {
+                velocity = transform.forward * movtSpd;
+            } else if ( !droppingPackage ){
+                droppingPackage = true;
+                StartCoroutine("DropPackage");
+            }
+        }
+    }
+    private IEnumerator DropPackage(){
+        anim.SetBool("",true);
+        yield return new WaitForSeconds(5f);
+        SetState(State.idle);
+        moveTo = null;
+        droppingPackage = false;
     }
     public void BePetted(){
         DebugWindow.LogSystem(GetType().Name,System.Reflection.MethodBase.GetCurrentMethod().Name);
@@ -345,7 +398,8 @@ public class Pet : MonoBehaviour, Character {
 public enum State {
     idle,
     chase,
-    attack
+    attack,
+    hasPackage
 }
 public class LevelStat {
     public string name;

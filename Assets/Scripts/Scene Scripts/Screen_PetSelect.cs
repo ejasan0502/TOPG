@@ -21,14 +21,8 @@ public class Screen_PetSelect : MonoBehaviour {
     public void Confirm(){
         if ( pet != null ){
             GameManager.instance.player.AddPet(pet);
-            StartCoroutine(DestroyWithDelay(0.1f));
+            SceneManager.LoadScene("playerscene");
         }
-    }
-
-    private IEnumerator DestroyWithDelay(float x){
-        yield return new WaitForSeconds(x);
-        Destroy(petButton.gameObject);
-        Destroy(gameObject);
     }
 
 }

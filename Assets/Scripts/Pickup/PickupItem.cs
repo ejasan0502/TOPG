@@ -3,10 +3,14 @@ using System.Collections;
 
 public class PickupItem : MonoBehaviour, Pickup {
     
+    private PickupManager pickupManager;
     private InventoryItem ii = null;
     private bool init = false;
     private Pet pet = null;
 
+    void Start(){
+        pickupManager = GameObject.FindObjectOfType<PickupManager>();
+    }
     void Update(){
         if ( pet != null ){
             transform.position = Vector3.Lerp(transform.position,pet.transform.position+(new Vector3(0f,0.5f,0f)),10f*Time.deltaTime);
@@ -28,7 +32,8 @@ public class PickupItem : MonoBehaviour, Pickup {
         DebugWindow.LogSystem(GetType().Name,System.Reflection.MethodBase.GetCurrentMethod().Name);
         if ( init && pet == null ){
             pet = p;
-            GameManager.instance.player.inventory.Add(ii.item,ii.amt);
+            if ( pickupManager != null ) pickupManager.Add(ii.item,ii.amt);
+            else GameManager.instance.player.inventory.Add(ii.item,ii.amt);
         }
     }
 }

@@ -63,12 +63,10 @@ public class CameraControls : MonoBehaviour {
     }
 
     public void Follow(Transform pos){
-        DebugWindow.LogSystem(GetType().Name,System.Reflection.MethodBase.GetCurrentMethod().Name);
         objectToFollow = pos;
         posToMove = null;
     }
     public void Move(Vector3 pos){
-        DebugWindow.LogSystem(GetType().Name,System.Reflection.MethodBase.GetCurrentMethod().Name);
         posToMove = pos;
         objectToFollow = null;
     }

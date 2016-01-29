@@ -1,8 +1,14 @@
 ﻿<PlayerScene>
   <SceneObject>
-    <name>Ground</name>
-    <position>0,0,0</position>
+    <name>Grass</name>
+    <position>0,-1.44,0</position>
     <rotation>0,0,0</rotation>
-    <scale>50,1,1</scale>
+    <scale>20,1,1</scale>
+  </SceneObject>
+  <SceneObject>
+    <name>PlayerSceneBackground</name>
+    <position>0,3.1,1</position>
+    <rotation>90,180,0</rotation>
+    <scale>2,1,1</scale>
   </SceneObject>
 </PlayerScene>

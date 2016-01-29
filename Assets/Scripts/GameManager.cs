@@ -38,6 +38,7 @@ public class GameManager : MonoBehaviour {
         DontDestroyOnLoad(this);
         contentData = new ContentData();
         _instance = this;
+
         GiveStartItems();
     }
 

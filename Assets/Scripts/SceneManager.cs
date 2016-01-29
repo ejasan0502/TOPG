@@ -6,6 +6,7 @@ using System.Collections.Generic;
 
 public class SceneManager : MonoBehaviour {
     
+    public bool savePlayerScene = false;
     public List<GameObject> ignoreList;
 
     private static Object lockObject = new Object();
@@ -21,14 +22,14 @@ public class SceneManager : MonoBehaviour {
         }
     }
 
-    private Scene currentScene = null;
     private Scene playerScene = null;
 
     public bool isNewPlayer = true;
 
     void Start(){
         DebugWindow.LogSystem(GetType().Name,System.Reflection.MethodBase.GetCurrentMethod().Name);
-        LoadData();
+        if ( !savePlayerScene )
+            LoadData();
     }
     private void LoadData(){
         DebugWindow.LogSystem(instance.GetType().Name,System.Reflection.MethodBase.GetCurrentMethod().Name);
@@ -67,7 +68,6 @@ public class SceneManager : MonoBehaviour {
     }
 
     public static void Save(){
-        if ( instance.playerScene == null || instance.currentScene != instance.playerScene ) return;
         DebugWindow.LogSystem(instance.GetType().Name,System.Reflection.MethodBase.GetCurrentMethod().Name);
 
         XmlDocument xmlDoc = new XmlDocument();
@@ -103,20 +103,15 @@ public class SceneManager : MonoBehaviour {
         xmlDoc.Save(Application.persistentDataPath+"/PlayerScene");
     }
     public static void LoadScene(string s){
-        if ( instance.currentScene == null ) return;
         DebugWindow.LogSystem(instance.GetType().Name,System.Reflection.MethodBase.GetCurrentMethod().Name);
-        if ( instance.currentScene.gameObjects.Count > 0 ){
-            foreach (GameObject o in instance.currentScene.gameObjects){
+        if ( GameObject.FindGameObjectsWithTag("SceneObject").Length > 0 ){
+            foreach (GameObject o in GameObject.FindGameObjectsWithTag("SceneObject")){
                 Destroy(o);
             }
-            instance.currentScene.gameObjects = new List<GameObject>();
         }
 
         if ( s.ToLower().Contains("tutorial") ){
-            GameObject obj = (GameObject) Instantiate(Resources.Load<GameObject>("Scenes/"+s));
-            instance.currentScene = new Scene();
-            instance.currentScene.name = s;
-            instance.currentScene.gameObjects.Add(obj);
+            Instantiate(Resources.Load<GameObject>("Scenes/"+s));
         } else if ( s.ToLower().Contains("playerscene") ){
             foreach (SceneObject so in instance.playerScene.sceneObjects){
                 GameObject o = (GameObject) Instantiate(Resources.Load<GameObject>("SceneObjects/"+so.name));
@@ -125,10 +120,23 @@ public class SceneManager : MonoBehaviour {
                 o.transform.localScale = so.scale;
                 instance.playerScene.gameObjects.Add(o);
             }
-            instance.currentScene = instance.playerScene;
         } else if ( s.ToLower().Contains("combat") ){
-            
+            Instantiate(Resources.Load<GameObject>("Scenes/Combat/"+s));
         }
+    }
+    public static void LoadScene(string s, Pet p){
+        DebugWindow.LogSystem(instance.GetType().Name,System.Reflection.MethodBase.GetCurrentMethod().Name);
+        if ( GameObject.FindGameObjectsWithTag("SceneObject").Length > 0 ){
+            foreach (GameObject o in GameObject.FindGameObjectsWithTag("SceneObject")){
+                Destroy(o);
+            }
+        }
+
+        GameObject dgo = (GameObject) Instantiate(Resources.Load("SceneObjects/DungeonGenerator"));
+        DungeonGenerator dg = dgo.GetComponent<DungeonGenerator>();
+
+        if ( s.ToLower().Contains("mining") ) dg.Initialize(s.ToLower(),p);
+        else if ( s.ToLower().Contains("gathering") ) dg.Initialize(s.ToLower(),p);
     }
 }
 

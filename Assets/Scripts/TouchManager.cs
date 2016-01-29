@@ -4,6 +4,7 @@ using System.Collections;
 
 public class TouchManager : MonoBehaviour {
 
+    public Travel travelObj;
     public GameObject petInfo;
     public bool camera_onClickMove = true;
     public RectTransform[] deadZones;
@@ -91,6 +92,8 @@ public class TouchManager : MonoBehaviour {
                 }
             }
             #endregion
+
+            startTime = Time.time;
         }
         prevMousePos = Input.mousePosition;
     }
@@ -115,10 +118,12 @@ public class TouchManager : MonoBehaviour {
 
             SpecialInteraction si = selectedObj.GetComponent<SpecialInteraction>();
             if ( si != null ) {
-                if ( Vector3.Distance(prevMousePos,Input.mousePosition) < 1f ){
-                    si.OnHold();
-                } else {
-                    si.OnDrag();
+                if ( Time.time - startTime > 1f ){
+                    if ( Vector3.Distance(prevMousePos,Input.mousePosition) < 1f ){
+                        si.OnHold();
+                    } else {
+                        si.OnDrag();
+                    }
                 }
             }
         } else if ( PlayerControls.instance.pet == null ){
@@ -143,15 +148,19 @@ public class TouchManager : MonoBehaviour {
                     Pet p = selectedObj.GetComponent<Pet>();
                     p.selected = true;
                     CameraControls.instance.Follow(selectedObj.transform);
+                    travelObj.pet = p;
                 } else {
                     Pet p = selectedObj.GetComponent<Pet>();
                     p.selected = false;
                     CameraControls.instance.ClearFollowing();
+                    travelObj.pet = null;
                 }
             }
 
             SpecialInteraction si = selectedObj.GetComponent<SpecialInteraction>();
-            if ( si != null ) si.OnExit();
+            if ( si != null ) {
+                si.OnExit();
+            }
 
             selectedObj = null;
             petting = false;

@@ -23,6 +23,7 @@ public class CameraControls : MonoBehaviour {
 
     private float cameraWidth;
     private float cameraHeight;
+    private bool locked = false;
 
     public void SetRect(Rect r){
         boundingRect = r;
@@ -67,10 +68,18 @@ public class CameraControls : MonoBehaviour {
         objectToFollow = pos;
         posToMove = null;
     }
+    public void Follow(Transform pos, bool b){
+        DebugWindow.LogSystem(GetType().Name,System.Reflection.MethodBase.GetCurrentMethod().Name);
+        objectToFollow = pos;
+        posToMove = null;
+        locked = true;
+    }
     public void Move(Vector3 pos){
         DebugWindow.LogSystem(GetType().Name,System.Reflection.MethodBase.GetCurrentMethod().Name);
-        posToMove = pos;
-        objectToFollow = null;
+        if ( !locked ){
+            posToMove = pos;
+            objectToFollow = null;
+        }
     }
     public void ClearFollowing(){
         DebugWindow.LogSystem(GetType().Name,System.Reflection.MethodBase.GetCurrentMethod().Name);

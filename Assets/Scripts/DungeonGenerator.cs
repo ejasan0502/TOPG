@@ -16,7 +16,7 @@ public class DungeonGenerator : MonoBehaviour {
     public GameObject chest;
 
     public GameObject testPet;
-    public string testMap = "gathering";
+    public string testMap = "";
 
     public float chestChance = 1f;
     public float oreChance = 25f;
@@ -307,7 +307,11 @@ public class DungeonGenerator : MonoBehaviour {
         #endregion
 
         if ( testPet != null ){
-            testPet.transform.position = GameObject.Find("Spawn Point").transform.position;
+            Vector3 testPetPos = GameObject.Find("Spawn Point").transform.position;
+            testPetPos.y += 0.5f;
+            testPet.transform.position = testPetPos;
+
+            PlayerControls.instance.SetPet(testPet.GetComponent<Pet>());
         }
     }
     private Bounds CreatePlatform(Vector3 position, Vector3 scale, List<Rect> rectList){
@@ -378,6 +382,12 @@ public class DungeonGenerator : MonoBehaviour {
         }
 
         return o.GetComponent<Renderer>().bounds;
+    }
+
+    public void Initialize(string s, Pet p){
+        testPet = p.gameObject;
+        CameraControls.instance.Follow(testPet.transform,true);
+        StartCoroutine(GenerateMap(s));
     }
 }
 
